@@ -22,7 +22,9 @@
     "express-validator": "^7.0.1",
     "fullcalendar": "^6.1.9",
     "method-override": "^3.0.0",
+    "mysql2": "^3.6.5",
     "node-fetch": "^3.3.2",
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1",
+    "sequelize": "^6.35.1"
   }
 }

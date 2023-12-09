@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1701975364257,
+    "tipoGasto": "gas",
+    "precio": "2",
+    "year": "2023",
+    "month": "12",
+    "departamento": "Las-Heras"
+  },
+  {
+    "id": 1701976994506,
+    "tipoGasto": "internet_tv",
+    "precio": "22",
+    "year": "2023",
+    "month": "12",
+    "departamento": "Corrientes"
+  },
+  {
+    "id": 1701977007074,
+    "tipoGasto": "internet_tv",
+    "precio": "222222",
+    "year": "2024",
+    "month": "1",
+    "departamento": "Corrientes"
+  },
+  {
+    "id": 1701978622162,
+    "tipoGasto": "internet_tv",
+    "precio": "500000",
+    "year": "2024",
+    "month": "1",
+    "departamento": "Las-Heras"
+  },
+  {
+    "id": 1702009608724,
+    "tipoGasto": "gas",
+    "precio": "122",
+    "year": "2023",
+    "month": "12",
+    "departamento": "Mansilla"
+  }
+]

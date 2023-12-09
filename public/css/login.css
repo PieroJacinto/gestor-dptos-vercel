@@ -1,0 +1,44 @@
+* {
+    box-sizing: border-box;
+  }
+  
+  body {
+    margin: 0;
+    font-family: sans-serif;
+  }
+  
+  body {
+    background-color: #f8f9fa !important;
+  }
+  
+  form {
+    max-width: 400px !important;
+    margin: 50px auto !important;
+    padding: 20px !important;
+    background-color: #fff !important;
+    border-radius: 10px !important;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  .form-group {
+    margin-bottom: 20px !important;
+  }
+  
+  label {
+    font-weight: bold !important;
+  }
+  
+  .form-text {
+    color: #6c757d !important;
+  }
+  
+  .form-check-label {
+    color: #6c757d !important;
+  }
+  
+  button {
+    width: 100% !important;
+  }
+  .btn-primary {
+    font-size: 16px !important;
+  }

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('./partials/head') %>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+    <!-- header -->
+    <header><%- include('./partials/header') %></header>
+
+    <main class="flex-grow-1 d-flex justify-content-center align-items-center">
+        <!-- Contenedor del Formulario con Título -->
+        <div class="container d-flex flex-column align-items-center">
+            <!-- Título del Formulario -->
+            <h2 class="mb-4 mt-4">Registrar Nueva Reserva</h2>         
+            
+
+            <!-- Formulario de Reserva -->
+            <form id="formulario-reserva" method="post" action="/nueva" class="my-4 p-4 border rounded w-75"
+                style="background-color: #f8f9fa;"  novalidate>
+                <div class="mb-3">
+                    <label for="nombre" class="form-label">Nombre de contacto:</label>
+                    <input 
+                        type="text" 
+                        id="nombre" 
+                        name="nombre" 
+                        class="form-control <%= locals.errors && errors.nombre ? "is-invalid" : null %>"
+                        value= "<%= locals.oldData ? oldData.nombre : null %>" 
+                    >
+                    <% if (locals.errors && errors.nombre ) { %>
+                        <div class="text-danger"> <%= errors.nombre.msg %></div>
+                    <% } %>
+                </div>
+
+                <div class="mb-3">
+                    <label for="telefono" class="form-label">Teléfono de contacto:</label>
+                    <input 
+                        type="tel" 
+                        id="telefono" 
+                        name="telefono" 
+                        class="form-control <%= locals.errors && errors.telefono ? "is-invalid" : null %>"
+                        value= "<%= locals.oldData ? oldData.telefono : null %>" 
+                    >
+                    <% if (locals.errors && errors.telefono ) { %>
+                        <div class="text-danger"> <%= errors.telefono.msg %></div>
+                    <% } %>
+                </div>
+
+                <div class="mb-3">
+                    <label for="departamento" class="form-label">Departamento:</label>
+                    <select 
+                        id="departamento" 
+                        name="departamento" 
+                        class="form-select <%= locals.errors && errors.departamento ? "is-invalid" : null %>"
+                        value= "<%= locals.oldData ? oldData.departamento : null %>"
+                    >   
+                        <option value=""> Elegí un Departamento</option>
+                        <% 
+                            const departamentos = ["Mansilla", "Corrientes", "Las-Heras"]
+                        %>
+                        <% for( const oneDpto of departamentos ) { %>
+                            <option 
+                                value="<%= oneDpto %>"
+                                <%= locals.oldData && (oneDpto === oldData.departamento) ? "selected": null %>                                
+                            >
+                            <%= oneDpto %></option>
+                        <% } %>                       
+                    </select>
+                    <% if (locals.errors && errors.departamento ) { %>
+                        <div class="text-danger"> <%= errors.departamento.msg %></div>
+                    <% } %>
+                </div>
+
+                <div class="mb-3">
+                    <label for="fechaCheckIn" class="form-label">Fecha de Check-In:</label>
+                    <input 
+                        type="date" 
+                        id="fechaCheckIn" 
+                        name="fechaCheckIn" 
+                        class="form-control <%= locals.errors && errors.fechaCheckIn ? "is-invalid" : null %>"
+                        value= "<%= locals.oldData ? oldData.fechaCheckIn : null %>"
+                    >
+                    <% if (locals.errors && errors.fechaCheckIn ) { %>
+                        <div class="text-danger"> <%= errors.fechaCheckIn.msg %></div>
+                    <% } %>
+                </div>
+            
+                <div class="mb-3">
+                    <label for="horaCheckIn" class="form-label">Horario de Check-In (opcional):</label>
+                    <input 
+                        type="time" id="horaCheckIn" name="horaCheckIn" class="form-control">
+                </div>
+            
+                <div class="mb-3">
+                    <label for="fechaCheckOut" class="form-label">Fecha de Check-Out:</label>
+                    <input 
+                        type="date" 
+                        id="fechaCheckOut" 
+                        name="fechaCheckOut" 
+                        class="form-control <%= locals.errors && errors.fechaCheckOut ? "is-invalid" : null %>" 
+                    >
+                    <% if (locals.errors && errors.fechaCheckOut ) { %>
+                        <div class="text-danger"> <%= errors.fechaCheckOut.msg %></div>
+                    <% } %>
+                </div>
+            
+                <div class="mb-3">
+                    <label for="horaCheckOut" class="form-label">Horario de Check-Out (opcional):</label>
+                    <input type="time" id="horaCheckOut" name="horaCheckOut" class="form-control">
+                </div>
+            
+                <!-- Campo oculto para la cantidad de días -->
+                <input type="hidden" id="cantidadDias" name="cantidadDias">
+
+                <div class="mb-3">
+                    <label for="cantidadHuespedes" class="form-label">Cantidad de huéspedes (max 4):</label>
+                    <input 
+                        type="number" 
+                        id="cantidadHuespedes" 
+                        name="cantidadHuespedes" 
+                        class="form-control <%= locals.errors && errors.cantidadHuespedes ? "is-invalid" : null %>" 
+                        min="1"
+                        max="4"
+                    >
+                        <% if (locals.errors && errors.cantidadHuespedes ) { %>
+                            <div class="text-danger"> <%= errors.cantidadHuespedes.msg %></div>
+                        <% } %>
+                        
+                </div>
+
+                <div class="mb-3">
+                    <label for="moneda" class="form-label">Moneda:</label>
+                    <select 
+                        id="moneda" 
+                        name="moneda" 
+                        class="form-select <%= locals.errors && errors.moneda ? "is-invalid" : null %>"
+                    >
+                        <option value=""> Elegí una moneda </option>
+                        <% 
+                            const monedas = ["ARS", "USD" ]
+                        %>
+                        <% for( const oneCoin of monedas) { %>
+                            <option 
+                                value="<%= oneCoin %>"
+                                <%= locals.oldData && (oneCoin === oldData.moneda) ? "selected": null %>                                
+                            >
+                            <%= oneCoin %></option>
+                        <% } %>  
+                        
+                    </select>
+                    <% if (locals.errors && errors.moneda ) { %>
+                        <div class="text-danger"> <%= errors.moneda.msg %></div>
+                    <% } %>
+                </div>
+
+                <div class="mb-3">
+                    <label for="precioPorDia" class="form-label">Precio por Día:</label>
+                    <input 
+                        type="number" 
+                        id="precioPorDia" 
+                        name="precioPorDia" 
+                        class="form-control <%= locals.errors && errors.precioPorDia ? "is-invalid" : null %>"
+                        min="0"
+                    >
+                    <% if (locals.errors && errors.precioPorDia ) { %>
+                        <div class="text-danger"> <%= errors.precioPorDia.msg %></div>
+                    <% } %>
+                </div>
+
+                <div class="mb-4">
+                    <label for="senia" class="form-label">Monto de Seña pagada (solo números):</label>
+                    <input type="text" id="senia" name="senia" pattern="[0-9]+" class="form-control"
+                        placeholder="Monto de la señal (opcional)">
+                </div>
+
+                <div class="text-center  ">
+                    <button type="submit" class="btn btn-reg">Registrar Reserva</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+</body>
+
+</html>

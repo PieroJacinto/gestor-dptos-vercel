@@ -1,0 +1,120 @@
+<!-- views/facturacion.ejs -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  
+  <title>Facturación Mensual</title>
+  <%- include('./partials/head') %>
+  <!-- Agregar enlaces a Bootstrap CSS -->
+  
+  <!-- Puedes cambiar la versión y el enlace según la versión de Bootstrap que prefieras -->
+</head>
+<header>
+  <%- include('./partials/header') %>
+</header>
+<body >
+
+  <h1 class="text-center mb-4 mt-4 fonts-1">Facturación Mensual para <%= departamento %></h1>
+  
+  <!-- Formulario centrado con estilos de Bootstrap -->
+  <form class="mx-auto mb-4" style="max-width: 350px;" action="/facturacion/<%= departamento %>" method="get">
+    <div class="form-group">
+      <label class="fs-3" for="year"><strong>Año:</strong></label>
+      <!-- Convertir el campo de año en un select -->
+      <select class="form-control " name="year" id="year">
+        <% const yearActual = new Date().getFullYear(); %>
+        <% for (let i = 2030; i >= 2000; i--) { %>
+          <option value="<%= i %>" <% if (i === yearActual) { %>selected<% } %>><%= i %></option>
+        <% } %>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="fs-3" for="month "><strong>Mes:</strong></label>
+      <!-- Convertir el campo de mes en un select con nombres de meses en español -->
+      <select class="form-control" name="month" id="month">
+        <% const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']; %>
+        <% const mesActual = new Date().getMonth() + 1; %>
+        <% for (let i = 0; i < meses.length; i++) { %>
+          <option value="<%= i + 1 %>" <% if (i + 1 === mesActual) { %>selected<% } %>><%= meses[i] %></option>
+        <% } %>
+      </select>
+    </div>
+    
+
+    <div class="text-center mt-4">
+      <button type="submit" class="btn btn-primary fs-4">Filtrar</button>
+    </div>
+  </form>
+  <div class="text-center mb-4">
+    <!-- Ordenar las reservas por fecha de check-in -->
+    <%
+      reservas.sort((a, b) => {
+        const fechaA = new Date(a.fechaCheckIn);
+        const fechaB = new Date(b.fechaCheckIn);
+        return fechaA - fechaB;
+      });
+    %>
+  
+  <div class="container-fluid">
+    <h2 class="text-center mb-4 fonts-1">
+      <% if (!selectedMonth) { %>
+        Reservas Totales para <%= departamento %> 
+      <% } else { %>
+        Reservas del Mes de <%= getMonthName(selectedMonth) %> de <%= departamento %>
+      <% } %>
+    </h2>
+  
+    <table class="table table-striped table-primary mt-4 mb-4 fs-3">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Desde</th>
+          <th>Hasta</th>
+          <th>Cantidad Días</th>
+          <th>Cantidad Huespedes</th>
+          <th>Precio por Día</th>
+          <th>Total</th>
+          <th>Pagó</th>
+          <th>Resta Pagar</th>
+        </tr>
+      </thead>
+      <!-- Dentro de la etiqueta <tbody> -->
+      <tbody>
+        <% for (let reserva of reservas) { %>
+          <tr>
+            <td>
+              <a href="/detalle/<%= reserva.id %>">
+                <%= reserva.nombre %>
+              </a>
+            </td>
+            <td><%= formatearFecha(reserva.fechaCheckIn) %></td>
+            <td><%= formatearFecha(reserva.fechaCheckOut) %></td>
+            <td><%= reserva.cantidadDias %></td>
+            <td><%= reserva.cantidadHuespedes %></td>
+            <td><strong>$<%= reserva.precioPorDia.toLocaleString() %></strong></td>
+            <td><strong>$ <%= reserva.total.toLocaleString() %> <%= reserva.moneda %></strong></td>
+            <td><strong>$ <%= reserva.senia.toLocaleString() %> <%= reserva.moneda %></strong></td>
+            <td><strong>$<%= reserva.restaPagar.toLocaleString() %></strong></td>
+          </tr>
+          <!-- Agregar más detalles de la reserva según tus necesidades -->
+        <% } %>
+      </tbody>
+
+    </table>
+  
+    <div class="fonts-1" > <strong>Total</strong> a Facturar en <strong>Pesos: $<%= totalPesos.toLocaleString() %></strong></div>
+    <div class="fonts-1"><strong>Total</strong> a Facturar en <strong>Dólares: $<%= totalDolares.toLocaleString() %></strong></div>
+
+    <div class="fonts-1"><strong>Total</strong> Pagado en <strong>Pesos: $<%= totalPagadoEnPesos.toLocaleString() %></strong></div>
+    <div class="fonts-1"><strong>Total</strong> Pagado en <strong>Dólares: $<%= totalPagadoEnDolares.toLocaleString() %></strong></div>
+
+    <div class="fonts-1"><strong>Resta</strong> Pagar en <strong>Pesos: $<%= restaPagarEnPesos.toLocaleString() %></strong></div>
+    <div class="fonts-1"><strong>Resta</strong> Pagar en <strong>Dólares: $<%= restaPagarEnDolares.toLocaleString() %></strong></div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+
+</body>
+</html>

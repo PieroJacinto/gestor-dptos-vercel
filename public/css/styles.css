@@ -1,0 +1,179 @@
+/*====== Fonts ======*/
+@import url('https://fonts.googleapis.com/css?family=Roboto:300,400,700&display=swap');
+
+
+/*====== Variables ======*/
+:root { 
+  --gray: #666666;
+  --light-gray: #ebebeb;  
+  --base-font-family: 'Roboto', sans-serif
+}
+
+
+/*====== Basics ======*/
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100vh;
+  margin: 0;
+  font-size: 10px;
+}
+
+body {
+  font-family: var(--base-font-family);
+  font-weight: 300;
+  background-color: var(--light-gray);
+}
+
+ul,
+ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  display: inline-block;
+  text-decoration: none;
+  color: inherit;
+}
+
+figure {
+  margin: 0;
+  padding: 0;
+}
+
+img {
+  width: 100%;
+}
+
+input,
+textarea {
+  font-family: inherit;
+}
+
+hr {
+  border: none;
+  border-bottom: solid 1px var(--light-gray);
+}
+
+
+.btn-reg {
+    color: #fff !important;
+    background-color: #445069 !important;
+    border-color: #445069 !important;
+    font-size: 16px !important;   
+    margin-top: 3rem !important; 
+}
+/* FORMULARIOS */
+/* Establecer el tamaño de fuente para los campos de formulario */
+.form-control {
+    font-size: 16px; /* o el tamaño de fuente que desees */
+}
+
+/* Establecer el tamaño de fuente para las etiquetas de formulario */
+.form-label {
+    font-size: 16px; /* o el tamaño de fuente que desees */
+}
+/* Establecer el tamaño de fuente para los values de las opciones */
+.form-select option {
+    font-size: 16px; /* Tamaño de fuente para los values de las opciones */
+}
+.form-select {
+    font-size: 16px !important;
+}
+/* Establecer el tamaño de fuente para el contenido dentro del elemento date */
+.form-control[type="date"]::-webkit-datetime-edit,
+.form-control[type="date"]::-webkit-inner-spin-button,
+.form-control[type="date"]::-webkit-clear-button {
+    font-size: 16px; /* Tamaño de fuente para el contenido dentro del elemento date en navegadores WebKit (Chrome, Safari, etc.) */
+}
+
+.form-control[type="date"] {
+    font-size: 16px; /* Tamaño de fuente para el contenido dentro del elemento date en navegadores que no son WebKit */
+}
+
+/* Establecer el tamaño de fuente para el texto seleccionado en el elemento select */
+.form-select option:checked {
+    font-size: 16px;
+}
+/* Establecer el tamaño de fuente y centrar verticalmente el placeholder */
+.form-control::placeholder {
+    font-size: 16px !important; /* Ajusta según sea necesario */
+    line-height: 1.5; /* Ajusta según sea necesario para la alineación vertical */
+}
+
+/* Añadir relleno al input y ajustar el tamaño del input */
+.form-control {
+    
+    font-size: 16px !important; /* Ajusta según sea necesario */
+}
+
+/* Opcional: Establecer el tamaño de fuente y centrar verticalmente el texto ingresado */
+.form-control:not(:placeholder-shown) {
+    line-height: 1.5; /* Ajusta según sea necesario para la alineación vertical */
+}
+
+/* Opcional: Ajustar el tamaño del texto ingresado */
+.form-control:not(:placeholder-shown) {
+    font-size: 16px !important; /* Ajusta según sea necesario */
+}
+.navbar>.container-fluid{
+  margin-left: 5rem !important;
+  margin-right: 5rem !important;
+}
+.nav-link {
+  margin-left: 2rem !important;
+  font-weight: 400 !important;
+  color: white !important;
+}
+.dropdown-item {
+  font-size: 15px !important;
+}
+.navbar-expand-lg .navbar-nav .dropdown-menu{
+  margin-left: 2rem !important;
+  font-weight: 800 !important;
+}
+#calendar .fc-event-title {
+  font-size: 16px; /* Tamaño de la letra deseado */
+  cursor: pointer;
+}
+
+/*  cards home */
+.card {
+  border: none !important;
+}
+/* Estilo adicional para centrar el texto sobre la imagen */
+.card-img-overlay {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: white;
+  
+}
+
+/* Efecto hover sobre el título */
+.card-title:hover {
+  text-decoration: underline;
+  color: turquoise;
+  cursor: pointer;
+}
+
+/* Configurar altura de la imagen dentro de la tarjeta */
+.card-img-top {
+  height: 300px; /* Ajusta la altura según tus necesidades */
+  object-fit: cover;
+  border-radius: 20px;
+}
+.text-danger{
+  font-size: 14px;
+}
+
+.fonts-1{
+  font-size: 3.5rem;
+}

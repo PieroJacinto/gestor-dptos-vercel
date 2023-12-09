@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <%- include('./partials/head') %>
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <style>
+    /* Agregar estilos personalizados */
+    select.form-select,
+    input.form-control {
+      background-color: #ffffff; /* Cambiar el color de fondo a blanco */
+    }
+  </style>
+</head>
+<header>
+  <%- include('./partials/header') %>
+</header>
+<body class="mt-4">
+  <div class="container">
+    <h1 class="text-center mt-4 mb-4">Agregar Gastos</h1>
+
+    <!-- Formulario para agregar gastos -->
+    <form action="/agregar/gastos" method="POST" id="formulario-gastos">
+      <div class="mb-3">
+        <label for="tipoGasto" class="form-label"><strong> Tipo de Gasto</strong></label>
+        <select class="form-select" id="tipoGasto" name="tipoGasto" required>
+          <option value="internet_tv">Internet/TV</option>
+          <option value="expensas">Expensas</option>
+          <option value="luz">Luz</option>
+          <option value="gas">Gas</option>
+          <option value="agua">Agua</option>
+          <option value="abl">ABL</option>          
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label for="precio" class="form-label"><strong>Precio</strong></label>
+        <input type="number" class="form-control" id="precio" name="precio" required>
+      </div>
+
+      <div class="form-group">
+        <label for="year" class="form-label"><strong>Año:</strong></label>
+        <select class="form-select" name="year" id="year">
+          <% const yearActual = new Date().getFullYear(); %>
+          <% for (let i = 2030; i >= 2000; i--) { %>
+            <option value="<%= i %>" <% if (i === yearActual) { %>selected<% } %>><%= i %></option>
+          <% } %>
+        </select>
+      </div>
+  
+      <div class="form-group mb-4">
+        <label for="month" class="form-label"><strong>Mes:</strong></label>
+        <select class="form-select" name="month" id="month">
+          <% const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']; %>
+          <% const mesActual = new Date().getMonth() + 1; %>
+          <% for (let i = 0; i < meses.length; i++) { %>
+            <option value="<%= i + 1 %>" <% if (i + 1 === mesActual) { %>selected<% } %>><%= meses[i] %></option>
+          <% } %>
+        </select>
+        </div>
+            <% if (locals.userLogged.admin == "full-admin") { %>
+                <div class="mb-3">
+                    <label for="departamento" class="form-label">Departamento:</label>
+                    <select 
+                        id="departamento" 
+                        name="departamento" 
+                        class="form-select <%= locals.errors && errors.departamento ? "is-invalid" : null %>"
+                        value= "<%= locals.oldData ? oldData.departamento : null %>"
+                    >   
+                        <option value=""> Elegí un Departamento</option>
+                        <% 
+                            const departamentos = ["Mansilla", "Corrientes", "Las-Heras"]
+                        %>
+                        <% for( const oneDpto of departamentos ) { %>
+                            <option 
+                                value="<%= oneDpto %>"
+                                <%= locals.oldData && (oneDpto === oldData.departamento) ? "selected": null %>                                
+                            >
+                            <%= oneDpto %></option>
+                        <% } %>                       
+                    </select>
+                    <% if (locals.errors && errors.departamento ) { %>
+                        <div class="text-danger"> <%= errors.departamento.msg %></div>
+                    <% } %>
+                </div>
+            <% } %>
+            <% if (locals.userLogged.admin == "las-heras-admin") { %>
+                <!-- Input oculto para el departamento -->
+                <input 
+                    type="hidden" 
+                    id="departamento" 
+                    name="departamento" 
+                    value="Las-Heras"
+                >             
+            <% } %>
+            <% if (locals.userLogged.admin == "corrientes-admin") { %>
+                <!-- Input oculto para el departamento -->
+                <input 
+                    type="hidden" 
+                    id="departamento" 
+                    name="departamento" 
+                    value="Corrientes"
+                >          
+            <% } %>
+         
+      <button type="submit" class="btn btn-primary fs-4">Agregar Gasto</button>
+    </form>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+</body>
+</html>

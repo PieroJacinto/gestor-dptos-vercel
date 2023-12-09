@@ -1,0 +1,112 @@
+<!-- verGastos.ejs -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <%- include('./partials/head') %>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    /* Estilos personalizados para el formulario */
+    .container {
+      max-width: 600px; /* Ajusta el ancho máximo del formulario según tus necesidades */
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem; /* Espaciado inferior entre grupos de formulario */
+    }
+
+    .form-select,
+    .form-control {
+      background-color: #ffffff; /* Cambia el color de fondo a blanco */
+    }
+
+   
+
+  </style>
+</head>
+<body class="mt-4">
+  <%- include('./partials/header') %>
+
+  <!-- Contenido de la página -->
+  <div class="container-fluid p-0">
+    <div class="container">
+
+        <h2>Gastos</h2>
+    
+        <!-- Formulario para seleccionar año y mes -->
+        <form method="GET" action="/ver/gastos">
+          <div class="form-group">
+            <label for="year">Año:</label>
+            <select class="form-select" name="year" id="year">
+              <% const yearActual = new Date().getFullYear(); %>
+              <% for (let i = 2030; i >= 2000; i--) { %>
+                <option value="<%= i %>" <% if (i == userYear) { %>selected<% } %>><%= i %></option>
+              <% } %>
+            </select>
+          </div>
+    
+          <div class="form-group">
+            <label for="month">Mes:</label>
+            <select class="form-select" name="month" id="month">
+              <% const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']; %>
+              <% for (let i = 1; i <= meses.length; i++) { %>
+                <option value="<%= i %>" <% if (i == userMonth) { %>selected<% } %>><%= meses[i - 1] %></option>
+              <% } %>
+            </select>
+          </div>
+    
+          <button type="submit" class="btn btn-primary fs-4 ">Filtrar</button>
+        </form>
+    </div>
+
+    <!-- Tabla de gastos -->
+    <table class="table table-striped table-primary mt-4 mb-4 fs-3">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Tipo de Gasto</th>
+          <th>Precio</th>
+          <th>Año</th>
+          <th>Mes</th>
+          <th>Departamento</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% let totalGastos = 0; %>
+        <% gastos.forEach((gasto, index) => { %>
+          <tr class="table-hover">
+            <th scope="row"><%= index + 1 %></th>
+            <td><%= gasto.tipoGasto %></td>
+            <td><strong>$<%= parseInt(gasto.precio).toLocaleString() %></strong></td>
+            <td><%= gasto.year %></td>
+            <td><%= meses[gasto.month - 1].toLocaleString() %></td>
+            <td><%= gasto.departamento.toLocaleString() %></td>
+            <td class="d-flex">
+              <form action="/gasto/<%= gasto.id %>/delete?_method=DELETE" method="POST" style="padding-right: 1rem;">               
+                <button type="submit" class="btn mr-2 fs-4 btn-danger" role="button" aria-pressed="true">
+                  <i class="fa-solid fa-trash-can"></i> Eliminar
+                </button>
+              </form>
+              
+            <a href="/gasto/<%= gasto.id %>/update" class="btn btn-success fs-4" role="button" aria-pressed="true">
+              <i class="fa-solid fa-arrow-rotate-left"></i>Actualizar
+            </a>
+          </td>
+            <% totalGastos += parseInt(gasto.precio); %>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+
+    <!-- Información adicional -->
+   
+      <div class="text-center mt-4">
+        <p class="fs-2"><strong>Total</strong> de gastos para <strong><%= meses[userMonth - 1] %></strong> para <strong><%= userDepartamento %>: </strong><strong>$<%= totalGastos.toLocaleString() %></strong></p>
+        <p class="fs-2"><strong>Total</strong> dividido por 2: <strong>$<%= (totalGastos / 2).toLocaleString() %></strong></p>
+      </div>
+    
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+</body

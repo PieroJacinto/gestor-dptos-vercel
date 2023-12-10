@@ -1,35 +1,43 @@
 const bcryptjs = require("bcryptjs");
 const { validationResult } = require("express-validator");
-
+const db = require("../database/models");
 const {
     index,
     one,
     agregarUsuario
 } = require("../models/usuarios.model");
+// Supongamos que este código está dentro de una función asíncrona o de un bloque async
+
 
 const User = require("../models/User")
 
 module.exports = {
     login: async (req, res) => {
         res.render("login");
+
     },
     processLogin: async (req, res) => {
         const resultValidation = validationResult(req);
-        
+
         if (resultValidation.errors.length > 0) {
-          return res.render("login", {
-            errors: resultValidation.mapped(),
-            oldData: req.body,
-          });
+            return res.render("login", {
+                errors: resultValidation.mapped(),
+                oldData: req.body,
+            });
         }
-        const userToLogin = User.findByField("email", req.body.email)
-        if(userToLogin){
+        const userToLogin = await db.Usuarios.findOne({
+            where: {
+                email: req.body.email,
+            },
+        });
+        if (userToLogin) {
             delete userToLogin.password
             req.session.userLogged = userToLogin;
         }
-        return res.redirect("/users/profile")        
-      },
-    
+        return res.redirect("/users/profile")
+
+    },
+
     register: async (req, res) => {
         res.render("register");
     },
@@ -44,19 +52,19 @@ module.exports = {
         const userTocreate = {
             ...req.body,
             password: bcryptjs.hashSync(req.body.password, 10),
-            admin: ""           
+            admin: ""
         }
 
         User.create(userTocreate);
-        return res.send("ok se guardo el usuario")       
+        return res.send("ok se guardo el usuario")
     },
-    profile: async (req, res ) => {
+    profile: async (req, res) => {
         const user = req.session.userLogged
         res.render("profile", { user })
-    }, 
+    },
     logout: async (req, res) => {
-       req.session = null
-    
+        req.session = null
+
         return res.redirect("/");
     }
 };

@@ -30,19 +30,15 @@ module.exports = function (sequelize, dataTypes) {
       foreignKey: "departamentoId",
     });
   
-    Departamento.hasMany(models.Usuarios, {
-      as: "usuarios",
+    Departamento.belongsToMany(models.Usuarios, {
+      through: "UsuarioDepartamento",
       foreignKey: "departamentoId",
+      as: "usuarios",
     });
+    
   };
 
-  // Relación "has many" con Usuarios
-  Departamento.associate = (models) => {
-    Departamento.hasMany(models.Usuarios, {
-      as: "Usuarios",
-      foreignKey: "departamentoId",
-    });
-  };
+  
 
 
   return Departamento;

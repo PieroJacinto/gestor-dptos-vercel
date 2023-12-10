@@ -2,6 +2,8 @@ const fs = require("fs");
 const path = require("path");
 
 const {validationResult } = require("express-validator");
+const db = require("../database/models");
+
 const Gasto = require("../models/Gasto")
 const {
   index,
@@ -17,17 +19,16 @@ module.exports = {
   nuevaReserva: async (req, res) => {
     res.render("nuevaReserva");
   },
-  agregarDpto: async (req, res) => {
-    const resultValidation = validationResult(req)
-    
-    if(resultValidation.errors.length > 0 ){
-      
-      return res.render("nuevaReserva",{
+  agregarDpto : async (req, res) => {
+    const resultValidation = validationResult(req);
+  
+    if (resultValidation.errors.length > 0) {
+      return res.render("nuevaReserva", {
         errors: resultValidation.mapped(),
         oldData: req.body
-      })
-    } 
-
+      });
+    }
+  
     const {
       nombre,
       telefono,
@@ -41,34 +42,39 @@ module.exports = {
       precioPorDia,
       senia,
     } = req.body;
-
+  
     // Validación de fechas
     const fechaCheckInObj = new Date(`${fechaCheckIn} ${horaCheckIn || ""}`);
     const fechaCheckOutObj = new Date(`${fechaCheckOut} ${horaCheckOut || ""}`);
-
+  
     if (fechaCheckOutObj <= fechaCheckInObj) {
-      // Manejar el caso en que la fecha de Check-Out es anterior o igual a la de Check-In
-      res
-        .status(400)
-        .send("La fecha de Check-Out debe ser posterior a la de Check-In");
+      res.status(400).send("La fecha de Check-Out debe ser posterior a la de Check-In");
       return;
     }
-
+  
     // Calcula la cantidad de días redondeando siempre hacia arriba
     const diffEnMilisegundos = fechaCheckOutObj - fechaCheckInObj;
     const cantidadDias = Math.ceil(diffEnMilisegundos / (1000 * 60 * 60 * 24));
-
+  
     // Calcula el precio total antes de aplicar la señal
     const precioTotal = cantidadDias * parseFloat(precioPorDia);
-
+  
     // Calcula el monto de la seña pagada por los huéspedes
     const seniaPagada = senia !== "" ? parseInt(senia) : 0;
-
-    // Crea un objeto con los datos del formulario
-    const nuevoDepartamento = {
+  
+    // Obtiene el departamento correspondiente al nombre proporcionado
+    const departamentoEncontrado = await db.Departamento.findOne({ where: { nombre: departamento } });
+  
+    if (!departamentoEncontrado) {
+      // Maneja el caso en que el departamento no existe
+      res.status(400).send('El departamento especificado no existe');
+      return;
+    }
+  
+    // Crea un objeto con los datos del formulario y el departamento asociado
+    const nuevaReserva = {
       nombre,
       telefono,
-      departamento,
       fechaCheckIn,
       horaCheckIn,
       fechaCheckOut,
@@ -81,13 +87,19 @@ module.exports = {
       restaPagar: precioTotal - seniaPagada,
       fechaReserva: new Date().toISOString().split("T")[0],
       cantidadDias,
+      departamentoId: departamentoEncontrado.id, // Asociamos el departamento a la reserva
     };
-
-    // Agrega el nuevo departamento al modelo
-    agregarNuevoDepartamento(nuevoDepartamento);
-
-    // Redirige después de agregar un nuevo departamento
-    res.redirect("/");
+  
+    try {
+      // Crea la reserva
+      await db.Reserva.create(nuevaReserva);
+  
+      // Redirige después de agregar un nuevo departamento
+      res.redirect("/");
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Error al crear la reserva");
+    }
   },
   editarVista: async (req, res) => {
     const reservaId = parseInt(req.params.id);

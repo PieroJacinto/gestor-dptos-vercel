@@ -1,12 +1,6 @@
 const bcryptjs = require("bcryptjs");
 const { validationResult } = require("express-validator");
 const db = require("../database/models");
-const {
-    index,
-    one,
-    agregarUsuario
-} = require("../models/usuarios.model");
-// Supongamos que este código está dentro de una función asíncrona o de un bloque async
 
 
 const User = require("../models/User")
@@ -54,9 +48,30 @@ module.exports = {
             password: bcryptjs.hashSync(req.body.password, 10),
             admin: ""
         }
+        const userInDb = await db.Usuarios.findOne({
+            where: {
+                email: req.body.email,
+            },
+        });
 
-        User.create(userTocreate);
-        return res.send("ok se guardo el usuario")
+        if (userInDb) {
+            return res.render("register", {
+                errors: {
+                    email: {
+                        msg: "Este email ya esta registrado",
+                    },
+                },
+                oldData: req.body,
+            });
+        } else if (resultValidation.errors.length == 0) {
+            await db.Usuarios.create({
+                ...req.body,
+                password: bcryptjs.hashSync(req.body.password, 10)
+            }).then(function () {
+                res.redirect("/login");
+            });
+        }
+
     },
     profile: async (req, res) => {
         const user = req.session.userLogged

@@ -195,116 +195,160 @@ module.exports = {
     }
   },
   calendario: async (req, res) => {
-    const departamentoSeleccionado = req.params.departamento;
-    const reservas = await index(); // Ajusta esto según tu aplicación
-
+    const nombreDepartamento = req.params.departamento;
+  
+    // Busca el departamento por nombre para obtener su ID
+    const departamento = await db.Departamento.findOne({
+      where: { nombre: nombreDepartamento },
+    });
+  
+    if (!departamento) {
+      // Maneja el caso en que el departamento no existe
+      return res.status(400).send('El departamento especificado no existe');
+    }
+  
+    // Obtén todas las reservas
+    const reservas = await db.Reserva.findAll();
+  
+    // Filtra las reservas por departamentoId
     const eventosDepartamento = reservas
-      .filter((reserva) => reserva.departamento === departamentoSeleccionado)
+      .filter((reserva) => reserva.departamentoId === departamento.id)
       .map((reserva) => ({
         title: reserva.nombre,
         start: reserva.fechaCheckIn,
         end: reserva.fechaCheckOut,
         id: reserva.id,
       }));
-    res.render("calendario", { eventosDepartamento, departamentoSeleccionado });
+  
+    res.render("calendario", { eventosDepartamento, departamentoSeleccionado: nombreDepartamento });
   },
+  
 
   detalle: async (req, res) => {
     id = parseInt(req.params.id);
-    reserva = obtenerReserva(id);
+    reserva = db.Reserva.findByPk(id);
     res.render("detalleReserva", { reserva });
   },
-  destroy: (req, res) => {
-    console.log("estoy en destroy");
-    const reservas = index();
-    const id = req.params.id;
-    const reservasRestantes = reservas.filter((reserva) => reserva.id != id);
-    const reservasGuardar = JSON.stringify(reservasRestantes, null, 2);
-    fs.writeFileSync(
-      path.resolve(__dirname, "../data/reservas.json"),
-      reservasGuardar
-    );
+  destroy: async (req, res) => {
+    console.log("estoy en destroy");  
+    await db.Reserva.destroy({
+      where: {
+        id: req.params.id,
+      },
+    });
     res.redirect("/");
-  },
+  },   
+  
   facturacion: async (req, res) => {
-    const departamento = req.params.departamento;
-    const selectedMonth = req.query.month;
-    const getMonthName = (month) => {
-      const meses = [
-        "Enero",
-        "Febrero",
-        "Marzo",
-        "Abril",
-        "Mayo",
-        "Junio",
-        "Julio",
-        "Agosto",
-        "Septiembre",
-        "Octubre",
-        "Noviembre",
-        "Diciembre",
-      ];
-      return meses[month - 1];
-    };
-
-    const formatearFecha = (fecha) => {
-      const opciones = { year: "numeric", month: "long", day: "numeric" };
-      const fechaLocal = new Date(fecha + "T00:00:00Z"); // Asegura que la fecha se interprete en UTC
-    
-      const dia = fechaLocal.getUTCDate();
-      const mes = fechaLocal.getUTCMonth() + 1;
-      const anio = fechaLocal.getUTCFullYear();
-    
-      return `${dia} de ${getMonthName(mes)} de ${anio}`;
-    }; 
-    // Obtener reservas del departamento específico
-    const reservas = obtenerDepartamento(departamento);
-
-    // Filtrar por año y mes (si se proporcionan en la consulta)
-    const { year, month } = req.query;
-    const reservasFiltradas = reservas.filter((reserva) => {
-      if (!year || !month) {
-        return true; // No hay filtro, mostrar todas las reservas
+    try {
+      const nombreDepartamento = req.params.departamento;
+      const selectedMonth = req.query.month;
+  
+      const departamento = await db.Departamento.findOne({
+        where: { nombre: nombreDepartamento },
+      });
+      console.log("departamento: ", JSON.stringify(departamento,null,4))
+      if (!departamento) {
+        return res.status(400).send('El departamento especificado no existe');
       }
-    
-      const fechaCheckIn = new Date(`${reserva.fechaCheckIn}T00:00:00Z`);     
-    
-      return (
-        fechaCheckIn.getUTCFullYear() === parseInt(year) &&
-        fechaCheckIn.getUTCMonth() === parseInt(month) - 1 &&
-        fechaCheckIn.getUTCDate() >= 1
+  
+      // Obtener todas las reservas del departamento
+      const reservas = await db.Reserva.findAll({
+        where: { departamentoId: departamento.id },
+      });
+      console.log("reservas: ", JSON.stringify(reservas,null,4))
+      // Filtrar por año y mes (si se proporcionan en la consulta)
+      const getMonthName = (month) => {
+        const meses = [
+          "Enero",
+          "Febrero",
+          "Marzo",
+          "Abril",
+          "Mayo",
+          "Junio",
+          "Julio",
+          "Agosto",
+          "Septiembre",
+          "Octubre",
+          "Noviembre",
+          "Diciembre",
+        ];
+        return meses[month - 1];
+      };
+      const formatearFecha = (fecha) => {
+        const opciones = { year: "numeric", month: "long", day: "numeric" };
+        const fechaLocal = new Date(fecha + "T00:00:00Z"); // Asegura que la fecha se interprete en UTC
+      
+        const dia = fechaLocal.getUTCDate();
+        const mes = fechaLocal.getUTCMonth() + 1;
+        const anio = fechaLocal.getUTCFullYear();
+      
+        return `${dia} de ${getMonthName(mes)} de ${anio}`;
+      }; 
+      const { year, month } = req.query;
+      const reservasFiltradas = reservas.filter((reserva) => {
+        if (!year || !month) {
+          return true; // No hay filtro, mostrar todas las reservas
+        }
+        
+        const fechaCheckIn = new Date(`${reserva.fechaCheckIn}T00:00:00Z`);
+  
+        return (
+          fechaCheckIn.getUTCFullYear() === parseInt(year) &&
+          fechaCheckIn.getUTCMonth() === parseInt(month) - 1 &&
+          fechaCheckIn.getUTCDate() >= 1
+        );
+      });
+  
+      // Calcular totales en pesos
+      const reservasEnPesos = reservasFiltradas.filter(
+        (reserva) => reserva.moneda === 'ARS'
       );
-    });      
-
-   // Calcular totales en pesos
-   const reservasEnPesos = reservasFiltradas.filter(reserva => reserva.moneda === 'ARS');
-   const totalPesos = reservasEnPesos.reduce((total, reserva) => total + reserva.total, 0);
-
-   // Calcular totales en dólares
-   const reservasEnDolares = reservasFiltradas.filter(reserva => reserva.moneda === 'USD');
-   const totalDolares = reservasEnDolares.reduce((total, reserva) => total + reserva.total, 0);
-
-   // Calcular Total Pagado en pesos y dólares
-   const totalPagadoEnPesos = reservasEnPesos.reduce((total, reserva) => total + reserva.senia, 0);
-   const totalPagadoEnDolares = reservasEnDolares.reduce((total, reserva) => total + reserva.senia, 0);
-
-   // Calcular lo que resta pagar en pesos y dólares
-   const restaPagarEnPesos = totalPesos - totalPagadoEnPesos;
-   const restaPagarEnDolares = totalDolares - totalPagadoEnDolares;
-
-   res.render("facturacion", {
-       departamento,
-       reservas: reservasFiltradas,
-       totalPesos,
-       totalDolares,
-       formatearFecha,
-       selectedMonth,
-       getMonthName,
-       totalPagadoEnPesos,
-       totalPagadoEnDolares,
-       restaPagarEnPesos,
-       restaPagarEnDolares
-   });
+      const totalPesos = reservasEnPesos.reduce(
+        (total, reserva) => total + reserva.total,
+        0
+      );
+  
+      // Calcular totales en dólares
+      const reservasEnDolares = reservasFiltradas.filter(
+        (reserva) => reserva.moneda === 'USD'
+      );
+      const totalDolares = reservasEnDolares.reduce(
+        (total, reserva) => total + reserva.total,
+        0
+      );
+  
+      // Calcular Total Pagado en pesos y dólares
+      const totalPagadoEnPesos = reservasEnPesos.reduce(
+        (total, reserva) => total + reserva.senia,
+        0
+      );
+      const totalPagadoEnDolares = reservasEnDolares.reduce(
+        (total, reserva) => total + reserva.senia,
+        0
+      );
+  
+      // Calcular lo que resta pagar en pesos y dólares
+      const restaPagarEnPesos = totalPesos - totalPagadoEnPesos;
+      const restaPagarEnDolares = totalDolares - totalPagadoEnDolares;
+  
+      res.render('facturacion', {
+        departamento: nombreDepartamento,
+        reservas: reservasFiltradas,
+        totalPesos,
+        totalDolares,
+        formatearFecha,
+        selectedMonth,
+        getMonthName,
+        totalPagadoEnPesos,
+        totalPagadoEnDolares,
+        restaPagarEnPesos,
+        restaPagarEnDolares,
+      });
+    } catch (error) {
+      console.error('Error al obtener reservas para facturación:', error);
+      res.status(500).send('Error interno del servidor');
+    }
   },
   gastos: async ( req, res ) => {
     res.render("gastos")

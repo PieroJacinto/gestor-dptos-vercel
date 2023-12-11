@@ -47,7 +47,7 @@
           <div class="text-danger"> <%= errors.telefono.msg %></div>
         <% } %>
       </div>
-   
+           
       <div class="mb-3">
         <label for="departamento" class="form-label">Departamento:</label>
         <select
@@ -60,7 +60,7 @@
           <% for (const oneDpto of departamentos) { %>
             <option
               value="<%= oneDpto.id %>"
-              <%= locals.oldData && (oneDpto.id === oldData.departamento) ? "selected" : (oneDpto.id === reserva.departamento) ? "selected" : "" %>
+              <%= (oneDpto.id === reserva.departamentoId) ? "selected" : "" %>
             >
               <%= oneDpto.nombre %>
             </option>

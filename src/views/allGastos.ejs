@@ -61,11 +61,14 @@
             <div class="form-group">
               <label for="department" class="fs-4"><strong>Departamento:</strong></label>
              <!-- En allGastos.ejs -->
-              <select class="form-select" name="department" id="department">
-                <option value="Mansilla" <%= userDepartment === 'Mansilla' ? 'selected' : '' %>>Mansilla</option>
-                <option value="Corrientes" <%= userDepartment === 'Corrientes' ? 'selected' : '' %>>Corrientes</option>
-                <option value="Las-Heras" <%= userDepartment === 'Las-Heras' ? 'selected' : '' %>>Las Heras</option>
-              </select>
+        <!-- En allGastos.ejs -->
+<select class="form-select" name="department" id="department">
+  <option value="Mansilla" <%= userDepartment === 'Mansilla' ? 'selected' : '' %>>Mansilla</option>
+  <option value="Corrientes" <%= userDepartment === 'Corrientes' ? 'selected' : '' %>>Corrientes</option>
+  <option value="Las-Heras" <%= userDepartment === 'Las-Heras' ? 'selected' : '' %>>Las Heras</option>
+</select>
+
+            
 
             </div>
           

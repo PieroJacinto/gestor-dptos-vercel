@@ -1,10 +1,5 @@
-const fs = require("fs");
-const path = require("path");
-
 const { validationResult } = require("express-validator");
 const db = require("../database/models");
-
-//const Gasto = require("../models/Gasto")
 
 module.exports = {
   home: async (req, res) => {
@@ -15,14 +10,12 @@ module.exports = {
   },
   agregarDpto: async (req, res) => {
     const resultValidation = validationResult(req);
-
     if (resultValidation.errors.length > 0) {
       return res.render("nuevaReserva", {
         errors: resultValidation.mapped(),
         oldData: req.body
       });
     }
-
     const {
       nombre,
       telefono,
@@ -64,7 +57,6 @@ module.exports = {
       res.status(400).send('El departamento especificado no existe');
       return;
     }
-
     // Crea un objeto con los datos del formulario y el departamento asociado
     const nuevaReserva = {
       nombre,
@@ -83,11 +75,9 @@ module.exports = {
       cantidadDias,
       departamentoId: departamentoEncontrado.id, // Asociamos el departamento a la reserva
     };
-
     try {
       // Crea la reserva
       await db.Reserva.create(nuevaReserva);
-
       // Redirige después de agregar un nuevo departamento
       res.redirect("/");
     } catch (error) {
@@ -98,41 +88,32 @@ module.exports = {
   editarVista: async (req, res) => {
     const reservaId = parseInt(req.params.id);
     const reserva = await db.Reserva.findByPk(reservaId);
-
     if (!reserva) {
       // Manejar el caso en que la reserva no se encuentre
       res.status(404).send("Reserva no encontrada");
       return;
     }
-
     res.render("editarReserva", { reserva });
   },
-
   editarReserva: async (req, res) => {
     const reservaId = parseInt(req.params.id);
-
     try {
       // Encuentra la reserva específica por ID
       const reservaExistente = await db.Reserva.findByPk(reservaId);
-
       if (!reservaExistente) {
         res.status(404).send("Reserva no encontrada");
         return;
       }
-
       // Validación de fechas y otros campos
       const resultValidation = validationResult(req);
-
       if (!resultValidation.isEmpty()) {
         return res.render("editarReserva", {
           csrfToken: req.csrfToken(),
           errors: resultValidation.mapped(),
           oldData: req.body,
           reserva: reservaExistente,
-
         });
       }
-
       // Extrae los datos actualizados del cuerpo de la solicitud
       const {
         nombre,
@@ -147,10 +128,6 @@ module.exports = {
         precioPorDia,
         senia,
       } = req.body;
-
-      // Validación de fechas (puede ser similar a la validación en agregarDpto)
-      // ...
-
       // Actualiza la reserva existente con los nuevos datos utilizando el método update
       await reservaExistente.update({
         nombre,
@@ -166,7 +143,6 @@ module.exports = {
         senia: senia !== "" ? parseInt(senia) : 0,
         // Actualiza otros campos según sea necesario
       });
-
       // Redirecciona a la página de detalle de la reserva actualizada
       res.redirect(`/detalle/${reservaId}`);
     } catch (error) {
@@ -174,23 +150,18 @@ module.exports = {
       res.status(500).send("Error interno al editar la reserva");
     }
   },
-
   calendario: async (req, res) => {
     const nombreDepartamento = req.params.departamento;
-
     // Busca el departamento por nombre para obtener su ID
     const departamento = await db.Departamento.findOne({
       where: { nombre: nombreDepartamento },
     });
-
     if (!departamento) {
       // Maneja el caso en que el departamento no existe
       return res.status(400).send('El departamento especificado no existe');
     }
-
     // Obtén todas las reservas
     const reservas = await db.Reserva.findAll();
-
     // Filtra las reservas por departamentoId
     const eventosDepartamento = reservas
       .filter((reserva) => reserva.departamentoId === departamento.id)
@@ -200,18 +171,14 @@ module.exports = {
         end: reserva.fechaCheckOut,
         id: reserva.id,
       }));
-
     res.render("calendario", { eventosDepartamento, departamentoSeleccionado: nombreDepartamento });
   },
-
   detalle: async (req, res) => {
     id = parseInt(req.params.id);
     reserva = await db.Reserva.findByPk(id);
-
     res.render("detalleReserva", { reserva });
   },
-  destroy: async (req, res) => {
-    console.log("estoy en destroy");
+  destroy: async (req, res) => {    
     await db.Reserva.destroy({
       where: {
         id: req.params.id,
@@ -219,12 +186,10 @@ module.exports = {
     });
     res.redirect("/");
   },
-
   facturacion: async (req, res) => {
     try {
       const nombreDepartamento = req.params.departamento;
       const selectedMonth = req.query.month;
-
       const departamento = await db.Departamento.findOne({
         where: { nombre: nombreDepartamento },
       });
@@ -232,7 +197,6 @@ module.exports = {
       if (!departamento) {
         return res.status(400).send('El departamento especificado no existe');
       }
-
       // Obtener todas las reservas del departamento
       const reservas = await db.Reserva.findAll({
         where: { departamentoId: departamento.id },
@@ -259,11 +223,9 @@ module.exports = {
       const formatearFecha = (fecha) => {
         const opciones = { year: "numeric", month: "long", day: "numeric" };
         const fechaLocal = new Date(fecha + "T00:00:00Z"); // Asegura que la fecha se interprete en UTC
-
         const dia = fechaLocal.getUTCDate();
         const mes = fechaLocal.getUTCMonth() + 1;
         const anio = fechaLocal.getUTCFullYear();
-
         return `${dia} de ${getMonthName(mes)} de ${anio}`;
       };
       const { year, month } = req.query;
@@ -271,16 +233,13 @@ module.exports = {
         if (!year || !month) {
           return true; // No hay filtro, mostrar todas las reservas
         }
-
         const fechaCheckIn = new Date(`${reserva.fechaCheckIn}T00:00:00Z`);
-
         return (
           fechaCheckIn.getUTCFullYear() === parseInt(year) &&
           fechaCheckIn.getUTCMonth() === parseInt(month) - 1 &&
           fechaCheckIn.getUTCDate() >= 1
         );
       });
-
       // Calcular totales en pesos
       const reservasEnPesos = reservasFiltradas.filter(
         (reserva) => reserva.moneda === 'ARS'
@@ -289,7 +248,6 @@ module.exports = {
         (total, reserva) => total + reserva.total,
         0
       );
-
       // Calcular totales en dólares
       const reservasEnDolares = reservasFiltradas.filter(
         (reserva) => reserva.moneda === 'USD'
@@ -298,7 +256,6 @@ module.exports = {
         (total, reserva) => total + reserva.total,
         0
       );
-
       // Calcular Total Pagado en pesos y dólares
       const totalPagadoEnPesos = reservasEnPesos.reduce(
         (total, reserva) => total + reserva.senia,
@@ -308,7 +265,6 @@ module.exports = {
         (total, reserva) => total + reserva.senia,
         0
       );
-
       // Calcular lo que resta pagar en pesos y dólares
       const restaPagarEnPesos = totalPesos - totalPagadoEnPesos;
       const restaPagarEnDolares = totalDolares - totalPagadoEnDolares;
@@ -336,24 +292,25 @@ module.exports = {
   },
   agregarGastos: async (req, res) => {
     const gasto = req.body;
-
     // Verifica si el departamento existe
     const departamentoExistente = await db.Departamento.findOne({
       where: {
         nombre: gasto.departamento,
       },
     });
-
     if (!departamentoExistente) {
       return res.status(400).send("El departamento no es válido");
     }
-
     // Asigna el ID del departamento al gasto
     gasto.departamentoId = departamentoExistente.id;
     // Crea el gasto solo si el departamento es válido
     try {
       await db.Gasto.create(gasto);
-      res.redirect("/");
+      if (req.session.userLogged.admin == "full-admin") {
+        res.redirect("/all/gastos");
+      } else {
+        res.redirect("/ver/gastos");
+      }
     } catch (error) {
       console.error("Error al agregar gasto:", error.message);
       res.status(500).send("Error interno al agregar gasto");
@@ -363,7 +320,7 @@ module.exports = {
     try {
       // Obtener el ID del usuario desde la sesión
       const userId = req.session.userLogged.id;
-  
+
       // Encontrar todas las asociaciones de UsuarioDepartamento para el usuario actual
       const userDepartments = await db.UsuarioDepartamento.findAll({
         where: {
@@ -371,18 +328,18 @@ module.exports = {
         },
         include: [{ model: db.Departamento, as: 'departamento' }],
       });
-  
+
       // Asegúrate de que userDepartments tenga al menos un departamento
       if (userDepartments.length === 0) {
         return res.status(404).send("No se encontraron departamentos asociados al usuario");
       }
-  
+
       const userYear = req.query.year || new Date().getFullYear().toString();
       const userMonth = req.query.month || (new Date().getMonth() + 1).toString();
-  
+
       // Obtener los IDs de los departamentos asociados al usuario
       const departmentIds = userDepartments.map(dep => dep.departamento.id);
-  
+
       // Filtrar gastos por departamentos, año y mes utilizando Sequelize
       const filteredGastos = await db.Gasto.findAll({
         where: {
@@ -391,13 +348,8 @@ module.exports = {
           month: userMonth,
         },
         include: [{ model: db.Departamento, as: 'departamento' }],
-      });
-  
-      // Ahora, filteredGastos contendrá todos los gastos que cumplen con los criterios especificados
-      console.log("gastos filtrados", filteredGastos);
-      console.log("userDepartments:", userDepartments);
-      console.log("filteredGastos:", filteredGastos);
-      
+      });     
+
       res.render("verGastos", { gastos: filteredGastos, userYear, userMonth, userDepartments });
     } catch (error) {
       console.error("Error al buscar gastos:", error.message);
@@ -405,49 +357,56 @@ module.exports = {
       res.status(500).send("Error interno al buscar gastos");
     }
   },
-  
-  
-  
-  
   allGastos: async (req, res) => {
     const userYear = req.query.year || new Date().getFullYear().toString();
     const userMonth = req.query.month || (new Date().getMonth() + 1).toString();
-
+    let userDepartment = req.query.department || "Mansilla"; // Valor por defecto
     try {
-      // Obtener la lista de departamentos asociados al usuario 1
+      // Obtener la lista de departamentos asociados al usuario (ajustar según tu modelo de Sequelize)
       const userDepartments = await db.UsuarioDepartamento.findAll({
         where: {
-          usuarioId: 1,
+          usuarioId: req.session.userLogged.id,
         },
         include: [{ model: db.Departamento, as: 'departamento' }],
       });
 
-      // Asegúrate de que userDepartments tenga al menos un departamento
       if (userDepartments.length === 0) {
         return res.status(404).send("No se encontraron departamentos asociados al usuario");
       }
-
-      // Obtener el nombre del primer departamento asociado al usuario
-      const userDepartment = userDepartments[0].departamento.nombre;
-
+      // Obtén los departamentoIds asociados al usuario
+      const departamentoIds = userDepartments.map(dep => dep.departamentoId);
       // Filtrar gastos por departamentos, año y mes utilizando Sequelize
-      const filteredGastos = await db.Gasto.findAll({
-        where: {
-          departamentoId: userDepartments.map(dep => dep.departamento.id),
-          year: userYear,
-          month: userMonth,
-        },
-        include: [{ model: db.Departamento, as: 'departamento' }],
-      });
+      let filteredGastos;
+      if (req.query.department) {
+        // Si se selecciona un departamento en el filtro, filtrar por ese departamento
+        const selectedDepartment = await db.Departamento.findOne({
+          where: {
+            nombre: userDepartment,
+          },
+        });
 
-      // Ahora, filteredGastos contendrá todos los gastos que cumplen con los criterios especificados
-      console.log("gastos filtrados", filteredGastos);
-
-      // Asegúrate de pasar userDepartment al renderizar la vista
+        filteredGastos = await db.Gasto.findAll({
+          where: {
+            departamentoId: selectedDepartment.id, // Utilizar el ID del departamento seleccionado
+            year: userYear,
+            month: userMonth,
+          },
+          include: [{ model: db.Departamento, as: 'departamento' }],
+        });
+      } else {
+        // Si no se selecciona un departamento en el filtro, cargar todos los gastos de "Mansilla"
+        filteredGastos = await db.Gasto.findAll({
+          where: {
+            departamentoId: 1, // ID de "Mansilla"
+            year: userYear,
+            month: userMonth,
+          },
+          include: [{ model: db.Departamento, as: 'departamento' }],
+        });
+      }      
       res.render("allGastos", { gastos: filteredGastos, userYear, userMonth, userDepartment });
     } catch (error) {
       console.error("Error al buscar gastos:", error.message);
-      // Manejar el error según sea necesario
       res.status(500).send("Error interno al buscar gastos");
     }
   },

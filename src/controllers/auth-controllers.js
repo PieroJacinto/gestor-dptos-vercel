@@ -74,7 +74,7 @@ module.exports = {
 
     },
     profile: async (req, res) => {
-        const user = req.session.userLogged
+        const user = req.session.userLogged        
         res.render("profile", { user })
     },
     logout: async (req, res) => {

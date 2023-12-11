@@ -1,221 +1,256 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <%- include('./partials/head') %>
-  </head>
 
-  <body>
-    <header><%- include('./partials/header') %></header>
+<head>
+  <%- include('./partials/head') %>
+</head>
 
-    <main>
-      <!-- Formulario de Edición de Reserva -->
-      <form
-        id="formulario-editar-reserva"        
-        action="/editar/<%= reserva.id %>?_method=PUT" 
-        method="POST"
-        class="my-4 p-4 border rounded w-75 "
-        style="background-color: #f8f9fa; margin: auto;"
-      >
-        <div class="mb-3">
-          <label for="nombre" class="form-label">Nombre de contacto:</label>
-          <input
-            type="text"
-            id="nombre"
-            name="nombre"
-            class="form-control"
-            value="<%= reserva.nombre %>"
-            required
-          />
-        </div>
+<body>
+  <header><%- include('./partials/header') %></header>
 
-        <div class="mb-3">
-          <label for="telefono" class="form-label">Teléfono de contacto:</label>
-          <input
-            type="tel"
-            id="telefono"
-            name="telefono"
-            class="form-control"
-            value="<%= reserva.telefono %>"
-            required
-          />
-        </div>
+  <main>
+    <!-- Formulario de Edición de Reserva -->
+    <form
+      id="formulario-editar-reserva"
+      action="/editar/<%= reserva.id %>?_method=PUT"
+      method="POST"
+      class="my-4 p-4 border rounded w-75 "
+      style="background-color: #f8f9fa; margin: auto;"
+    >
+      <div class="mb-3">
+        <label for="nombre" class="form-label">Nombre de contacto:</label>
+        <input
+          type="text"
+          id="nombre"
+          name="nombre"
+          class="form-control <%= locals.errors && errors.nombre ? "is-invalid" : null %>"
+          value="<%= locals.oldData ? oldData.nombre : reserva.nombre %>"
+          required
+        >
+        <% if (locals.errors && errors.nombre) { %>
+          <div class="text-danger"> <%= errors.nombre.msg %></div>
+        <% } %>
+      </div>
 
-        <div class="mb-3">
-          <label for="departamento" class="form-label">Departamento:</label>
-          <input
-            type="text"
-            id="departamento"
-            name="departamento"
-            class="form-control"
-            value="<%= reserva.departamento %>"
-            required
-          />
-        </div>
+      <div class="mb-3">
+        <label for="telefono" class="form-label">Teléfono de contacto:</label>
+        <input
+          type="tel"
+          id="telefono"
+          name="telefono"
+          class="form-control <%= locals.errors && errors.telefono ? "is-invalid" : null %>"
+          value="<%= locals.oldData ? oldData.telefono : reserva.telefono %>"
+          required
+        >
+        <% if (locals.errors && errors.telefono) { %>
+          <div class="text-danger"> <%= errors.telefono.msg %></div>
+        <% } %>
+      </div>
 
-        <div class="mb-3">
-          <label for="fechaCheckIn" class="form-label"
-            >Fecha de Check-In:</label
-          >
-          <input
-            type="date"
-            id="fechaCheckIn"
-            name="fechaCheckIn"
-            class="form-control"
-            value="<%= reserva.fechaCheckIn %>"
-            required
-          />
-        </div>
+      <div class="mb-3">
+        <label for="departamento" class="form-label">Departamento:</label>
+        <select
+          id="departamento"
+          name="departamento"
+          class="form-select <%= locals.errors && errors.departamento ? "is-invalid" : null %>"
+          required
+        >
+          <option value=""> Elegí un Departamento</option>
+          <% for (const oneDpto of departamentos) { %>
+            <option
+              value="<%= oneDpto %>"
+              <%= locals.oldData && (oneDpto === oldData.departamento) ? "selected" : (oneDpto === reserva.departamento) ? "selected" : "" %>
+            >
+              <%= oneDpto %></option>
+          <% } %>
+        </select>
+        <% if (locals.errors && errors.departamento) { %>
+          <div class="text-danger"> <%= errors.departamento.msg %></div>
+        <% } %>
+      </div>
 
-        <div class="mb-3">
-          <label for="horaCheckIn" class="form-label">Hora de Check-In:</label>
-          <input
-            type="time"
-            id="horaCheckIn"
-            name="horaCheckIn"
-            class="form-control"
-            value="<%= reserva.horaCheckIn %>"
-          />
-        </div>
+      <div class="mb-3">
+        <label for="fechaCheckIn" class="form-label">Fecha de Check-In:</label>
+        <input
+          type="date"
+          id="fechaCheckIn"
+          name="fechaCheckIn"
+          class="form-control <%= locals.errors && errors.fechaCheckIn ? "is-invalid" : null %>"
+          value="<%= locals.oldData ? oldData.fechaCheckIn : reserva.fechaCheckIn %>"
+          required
+        >
+        <% if (locals.errors && errors.fechaCheckIn) { %>
+          <div class="text-danger"> <%= errors.fechaCheckIn.msg %></div>
+        <% } %>
+      </div>
 
-        <div class="mb-3">
-          <label for="fechaCheckOut" class="form-label"
-            >Fecha de Check-Out:</label
-          >
-          <input
-            type="date"
-            id="fechaCheckOut"
-            name="fechaCheckOut"
-            class="form-control"
-            value="<%= reserva.fechaCheckOut %>"
-            required
-          />
-        </div>
+      <div class="mb-3">
+        <label for="horaCheckIn" class="form-label">Hora de Check-In:</label>
+        <input
+          type="time"
+          id="horaCheckIn"
+          name="horaCheckIn"
+          class="form-control"
+          value="<%= reserva.horaCheckIn %>"
+        >
+      </div>
 
-        <div class="mb-3">
-          <label for="horaCheckOut" class="form-label"
-            >Hora de Check-Out:</label
-          >
-          <input
-            type="time"
-            id="horaCheckOut"
-            name="horaCheckOut"
-            class="form-control"
-            value="<%= reserva.horaCheckOut %>"
-          />
-        </div>
+      <div class="mb-3">
+        <label for="fechaCheckOut" class="form-label">Fecha de Check-Out:</label>
+        <input
+          type="date"
+          id="fechaCheckOut"
+          name="fechaCheckOut"
+          class="form-control <%= locals.errors && errors.fechaCheckOut ? "is-invalid" : null %>"
+          value="<%= locals.oldData ? oldData.fechaCheckOut : reserva.fechaCheckOut %>"
+          required
+        >
+        <% if (locals.errors && errors.fechaCheckOut) { %>
+          <div class="text-danger"> <%= errors.fechaCheckOut.msg %></div>
+        <% } %>
+      </div>
 
-        <div class="mb-3">
-          <label for="cantidadHuespedes" class="form-label"
-            >Cantidad de huéspedes (max 4):</label
-          >
-          <input
-            type="number"
-            id="cantidadHuespedes"
-            name="cantidadHuespedes"
-            class="form-control"
-            min="1"
-            max="4"
-            value="<%= reserva.cantidadHuespedes %>"
-            required
-          />
-        </div>
+      <div class="mb-3">
+        <label for="horaCheckOut" class="form-label">Hora de Check-Out:</label>
+        <input
+          type="time"
+          id="horaCheckOut"
+          name="horaCheckOut"
+          class="form-control"
+          value="<%= reserva.horaCheckOut %>"
+        >
+      </div>
 
-        <div class="mb-3">
-          <label for="moneda" class="form-label">Moneda:</label>
-          <input
-            type="text"
-            id="moneda"
-            name="moneda"
-            class="form-control"
-            value="<%= reserva.moneda %>"
-            required
-          />
-        </div>
+      <div class="mb-3">
+        <label for="cantidadHuespedes" class="form-label">Cantidad de huéspedes (max 4):</label>
+        <input
+          type="number"
+          id="cantidadHuespedes"
+          name="cantidadHuespedes"
+          class="form-control <%= locals.errors && errors.cantidadHuespedes ? "is-invalid" : null %>"
+          min="1"
+          max="4"
+          value="<%= locals.oldData ? oldData.cantidadHuespedes : reserva.cantidadHuespedes %>"
+          required
+        >
+        <% if (locals.errors && errors.cantidadHuespedes) { %>
+          <div class="text-danger"> <%= errors.cantidadHuespedes.msg %></div>
+        <% } %>
+      </div>
 
-        <div class="mb-3">
-          <label for="precioPorDia" class="form-label">Precio por Día:</label>
-          <input
-            type="number"
-            id="precioPorDia"
-            name="precioPorDia"
-            class="form-control"
-            min="0"
-            value="<%= reserva.precioPorDia %>"
-            required
-          />
-        </div>
+      <div class="mb-3">
+        <label for="moneda" class="form-label">Moneda:</label>
+        <select
+          id="moneda"
+          name="moneda"
+          class="form-select <%= locals.errors && errors.moneda ? "is-invalid" : null %>"
+          required
+        >
+          <option value=""> Elegí una moneda </option>
+          <% for (const oneCoin of monedas) { %>
+            <option
+              value="<%= oneCoin %>"
+              <%= locals.oldData && (oneCoin === oldData.moneda) ? "selected" : (oneCoin === reserva.moneda) ? "selected" : "" %>
+            >
+              <%= oneCoin %></option>
+          <% } %>
+        </select>
+        <% if (locals.errors && errors.moneda) { %>
+          <div class="text-danger"> <%= errors.moneda.msg %></div>
+        <% } %>
+      </div>
 
-        <div class="mb-4">
-          <label for="senia" class="form-label"
-            >Monto de Seña pagada (solo números):</label
-          >
-          <input
-            type="text"
-            id="senia"
-            name="senia"
-            pattern="[0-9]+"
-            class="form-control"
-            placeholder="Monto de la señal (opcional)"
-            value="<%= reserva.senia %>"
-          />
-        </div>
+      <div class="mb-3">
+        <label for="precioPorDia" class="form-label">Precio por Día:</label>
+        <input
+          type="number"
+          id="precioPorDia"
+          name="precioPorDia"
+          class="form-control <%= locals.errors && errors.precioPorDia ? "is-invalid" : null %>"
+          min="0"
+          value="<%= locals.oldData ? oldData.precioPorDia : reserva.precioPorDia %>"
+          required
+        >
+        <% if (locals.errors && errors.precioPorDia) { %>
+          <div class="text-danger"> <%= errors.precioPorDia.msg %></div>
+        <% } %>
+      </div>
 
-        <div class="mb-4">
-          <label for="total" class="form-label">Total:</label>
-          <input
-            type="text"
-            id="total"
-            name="total"
-            class="form-control"
-            value="<%= reserva.total %>"
-            readonly
-          />
-        </div>
+      <div class="mb-4">
+        <label for="senia" class="form-label"
+          >Monto de Seña pagada (solo números):</label
+        >
+        <input
+          type="text"
+          id="senia"
+          name="senia"
+          pattern="[0-9]+"
+          class="form-control <%= locals.errors && errors.senia ? "is-invalid" : null %>"
+          placeholder="Monto de la señal (opcional)"
+          value="<%= locals.oldData ? oldData.senia : reserva.senia %>"
+        >
+        <% if (locals.errors && errors.senia) { %>
+          <div class="text-danger"> <%= errors.senia.msg %></div>
+        <% } %>
+      </div>
 
-        <div class="mb-4">
-          <label for="restaPagar" class="form-label">Resta a Pagar:</label>
-          <input
-            type="text"
-            id="restaPagar"
-            name="restaPagar"
-            class="form-control"
-            value="<%= reserva.restaPagar %>"
-            readonly
-          />
-        </div>
+      <div class="mb-4">
+        <label for="total" class="form-label">Total:</label>
+        <input
+          type="text"
+          id="total"
+          name="total"
+          class="form-control"
+          value="<%= reserva.total %>"
+          readonly
+        />
+      </div>
 
-        <div class="mb-4">
-          <label for="fechaReserva" class="form-label">Fecha de Reserva:</label>
-          <input
-            type="text"
-            id="fechaReserva"
-            name="fechaReserva"
-            class="form-control"
-            value="<%= reserva.fechaReserva %>"
-            readonly
-          />
-        </div>
+      <div class="mb-4">
+        <label for="restaPagar" class="form-label">Resta a Pagar:</label>
+        <input
+          type="text"
+          id="restaPagar"
+          name="restaPagar"
+          class="form-control"
+          value="<%= reserva.restaPagar %>"
+          readonly
+        />
+      </div>
 
-        <div class="mb-4">
-          <label for="cantidadDias" class="form-label">Cantidad de Días:</label>
-          <input
-            type="text"
-            id="cantidadDias"
-            name="cantidadDias"
-            class="form-control"
-            value="<%= reserva.cantidadDias %>"
-            readonly
-          />
-        </div>
+      <div class="mb-4">
+        <label for="fechaReserva" class="form-label">Fecha de Reserva:</label>
+        <input
+          type="text"
+          id="fechaReserva"
+          name="fechaReserva"
+          class="form-control"
+          value="<%= reserva.fechaReserva %>"
+          readonly
+        />
+      </div>
 
-        <div class="text-center">
-          <button type="submit" class="btn btn-primary">
-            Actualizar Reserva
-          </button>
-        </div>
-      </form>
-    </main>
+      <div class="mb-4">
+        <label for="cantidadDias" class="form-label">Cantidad de Días:</label>
+        <input
+          type="text"
+          id="cantidadDias"
+          name="cantidadDias"
+          class="form-control"
+          value="<%= reserva.cantidadDias %>"
+          readonly
+        />
+      </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
-  </body>
+      <div class="text-center">
+        <button type="submit" class="btn btn-primary">
+          Actualizar Reserva
+        </button>
+      </div>
+    </form>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+</body>
+
 </html>

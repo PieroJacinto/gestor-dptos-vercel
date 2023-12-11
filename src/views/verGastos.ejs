@@ -80,7 +80,7 @@
             <td><strong>$<%= parseInt(gasto.precio).toLocaleString() %></strong></td>
             <td><%= gasto.year %></td>
             <td><%= meses[gasto.month - 1].toLocaleString() %></td>
-            <td><%= gasto.departamento.toLocaleString() %></td>
+            <td><%= gasto.departamento.nombre %></td>
             <td class="d-flex">
               <form action="/gasto/<%= gasto.id %>/delete?_method=DELETE" method="POST" style="padding-right: 1rem;">               
                 <button type="submit" class="btn mr-2 fs-4 btn-danger" role="button" aria-pressed="true">
@@ -101,7 +101,15 @@
     <!-- Información adicional -->
    
       <div class="text-center mt-4">
-        <p class="fs-2"><strong>Total</strong> de gastos para <strong><%= meses[userMonth - 1] %></strong> para <strong><%= userDepartamento %>: </strong><strong>$<%= totalGastos.toLocaleString() %></strong></p>
+        <p class="fs-2">
+          <strong>Total</strong> de gastos para
+          <strong><%= meses[userMonth - 1] %></strong>
+          para
+          <strong><%= userDepartments[0].departamento.nombre %>: </strong>
+          <strong>$<%= totalGastos.toLocaleString() %></strong>
+        </p>
+        
+
         <p class="fs-2"><strong>Total</strong> dividido por 2: <strong>$<%= (totalGastos / 2).toLocaleString() %></strong></p>
       </div>
     

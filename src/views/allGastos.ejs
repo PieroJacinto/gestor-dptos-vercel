@@ -60,11 +60,13 @@
           
             <div class="form-group">
               <label for="department" class="fs-4"><strong>Departamento:</strong></label>
+             <!-- En allGastos.ejs -->
               <select class="form-select" name="department" id="department">
                 <option value="Mansilla" <%= userDepartment === 'Mansilla' ? 'selected' : '' %>>Mansilla</option>
                 <option value="Corrientes" <%= userDepartment === 'Corrientes' ? 'selected' : '' %>>Corrientes</option>
                 <option value="Las-Heras" <%= userDepartment === 'Las-Heras' ? 'selected' : '' %>>Las Heras</option>
               </select>
+
             </div>
           
             <button type="submit" class="btn btn-primary fs-4">Filtrar</button>
@@ -93,7 +95,7 @@
             <td><strong>$<%= parseInt(gasto.precio).toLocaleString() %></strong></td>
             <td><%= gasto.year %></td>
             <td><%= meses[gasto.month - 1].toLocaleString() %></td>
-            <td><%= gasto.departamento.toLocaleString() %></td>
+            <td><%= gasto.departamento.nombre %></td>
             <td class="d-flex">
                 <form action="" style="padding-right: 1rem;" >
                     <a href="/gasto/<%= gasto.id %>/delete" class="btn mr-2 fs-4 btn-danger" role="button" aria-pressed="true">

@@ -19,7 +19,7 @@ router.get("/detalle/:id", mainControllers.detalle)
 
 // Nuevas rutas para la edición
 router.get("/editar/:id", mainControllers.editarVista);
-router.put("/editar/:id", mainControllers.editarReserva);
+router.put("/editar/:id", reserveValidations, mainControllers.editarReserva);
 router.delete("/eliminar/:id", mainControllers.destroy);
 
 // Agrega una nueva ruta para manejar las reservas por departamento

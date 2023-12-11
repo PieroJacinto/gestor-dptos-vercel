@@ -16,6 +16,7 @@
       method="POST"
       class="my-4 p-4 border rounded w-75 "
       style="background-color: #f8f9fa; margin: auto;"
+      novalidate
     >
       <div class="mb-3">
         <label for="nombre" class="form-label">Nombre de contacto:</label>
@@ -46,7 +47,7 @@
           <div class="text-danger"> <%= errors.telefono.msg %></div>
         <% } %>
       </div>
-
+   
       <div class="mb-3">
         <label for="departamento" class="form-label">Departamento:</label>
         <select
@@ -58,10 +59,11 @@
           <option value=""> Elegí un Departamento</option>
           <% for (const oneDpto of departamentos) { %>
             <option
-              value="<%= oneDpto %>"
-              <%= locals.oldData && (oneDpto === oldData.departamento) ? "selected" : (oneDpto === reserva.departamento) ? "selected" : "" %>
+              value="<%= oneDpto.id %>"
+              <%= locals.oldData && (oneDpto.id === oldData.departamento) ? "selected" : (oneDpto.id === reserva.departamento) ? "selected" : "" %>
             >
-              <%= oneDpto %></option>
+              <%= oneDpto.nombre %>
+            </option>
           <% } %>
         </select>
         <% if (locals.errors && errors.departamento) { %>
@@ -192,55 +194,7 @@
         <% if (locals.errors && errors.senia) { %>
           <div class="text-danger"> <%= errors.senia.msg %></div>
         <% } %>
-      </div>
-
-      <div class="mb-4">
-        <label for="total" class="form-label">Total:</label>
-        <input
-          type="text"
-          id="total"
-          name="total"
-          class="form-control"
-          value="<%= reserva.total %>"
-          readonly
-        />
-      </div>
-
-      <div class="mb-4">
-        <label for="restaPagar" class="form-label">Resta a Pagar:</label>
-        <input
-          type="text"
-          id="restaPagar"
-          name="restaPagar"
-          class="form-control"
-          value="<%= reserva.restaPagar %>"
-          readonly
-        />
-      </div>
-
-      <div class="mb-4">
-        <label for="fechaReserva" class="form-label">Fecha de Reserva:</label>
-        <input
-          type="text"
-          id="fechaReserva"
-          name="fechaReserva"
-          class="form-control"
-          value="<%= reserva.fechaReserva %>"
-          readonly
-        />
-      </div>
-
-      <div class="mb-4">
-        <label for="cantidadDias" class="form-label">Cantidad de Días:</label>
-        <input
-          type="text"
-          id="cantidadDias"
-          name="cantidadDias"
-          class="form-control"
-          value="<%= reserva.cantidadDias %>"
-          readonly
-        />
-      </div>
+      </div>     
 
       <div class="text-center">
         <button type="submit" class="btn btn-primary">

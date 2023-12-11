@@ -86,26 +86,43 @@ module.exports = {
     }
   },
   editarVista: async (req, res) => {
-    const reservaId = parseInt(req.params.id);
-    const reserva = await db.Reserva.findByPk(reservaId);
-    if (!reserva) {
-      // Manejar el caso en que la reserva no se encuentre
-      res.status(404).send("Reserva no encontrada");
-      return;
+    try {
+      const reservaId = parseInt(req.params.id);
+      const reserva = await db.Reserva.findByPk(reservaId);
+
+      if (!reserva) {
+        res.status(404).send("Reserva no encontrada");
+        return;
+      }
+
+      // Obtener todos los departamentos
+      const departamentos = await db.Departamento.findAll();
+      const monedas = ["ARS", "USD"];
+      res.render("editarReserva", { reserva, departamentos, monedas });
+    } catch (error) {
+      console.error("Error al obtener la reserva o departamentos:", error);
+      res.status(500).send("Error interno del servidor");
     }
-    res.render("editarReserva", { reserva });
   },
+
+  // Editar Reserva
+  // Editar Reserva
+  // Editar Reserva
   editarReserva: async (req, res) => {
     const reservaId = parseInt(req.params.id);
+
     try {
       // Encuentra la reserva específica por ID
       const reservaExistente = await db.Reserva.findByPk(reservaId);
+
       if (!reservaExistente) {
         res.status(404).send("Reserva no encontrada");
         return;
       }
+
       // Validación de fechas y otros campos
       const resultValidation = validationResult(req);
+
       if (!resultValidation.isEmpty()) {
         return res.render("editarReserva", {
           csrfToken: req.csrfToken(),
@@ -114,6 +131,7 @@ module.exports = {
           reserva: reservaExistente,
         });
       }
+
       // Extrae los datos actualizados del cuerpo de la solicitud
       const {
         nombre,
@@ -128,7 +146,28 @@ module.exports = {
         precioPorDia,
         senia,
       } = req.body;
-      // Actualiza la reserva existente con los nuevos datos utilizando el método update
+
+      // Calcula la cantidad de días redondeando siempre hacia arriba
+      const fechaCheckInObj = new Date(`${fechaCheckIn} ${horaCheckIn || ""}`);
+      const fechaCheckOutObj = new Date(`${fechaCheckOut} ${horaCheckOut || ""}`);
+      const diffEnMilisegundos = fechaCheckOutObj - fechaCheckInObj;
+      const cantidadDias = Math.ceil(diffEnMilisegundos / (1000 * 60 * 60 * 24));
+
+      // Calcula el precio total antes de aplicar la señal
+      const precioTotal = cantidadDias * parseFloat(precioPorDia);
+
+      // Calcula el monto de la seña pagada por los huéspedes
+      const seniaPagada = senia !== "" ? parseInt(senia) : 0;
+
+      // Obtiene el departamento correspondiente al nombre proporcionado
+      const departamentoEncontrado = await db.Departamento.findByPk(departamento);
+
+      if (!departamentoEncontrado) {
+        res.status(400).send('El departamento especificado no existe');
+        return;
+      }
+
+      // Actualiza la reserva existente con los nuevos datos
       await reservaExistente.update({
         nombre,
         telefono,
@@ -140,9 +179,15 @@ module.exports = {
         cantidadHuespedes: parseInt(cantidadHuespedes),
         moneda,
         precioPorDia: parseFloat(precioPorDia),
-        senia: senia !== "" ? parseInt(senia) : 0,
+        senia: seniaPagada,
+        total: precioTotal,
+        restaPagar: precioTotal - seniaPagada,
+        fechaReserva: new Date().toISOString().split("T")[0],
+        cantidadDias,
+        departamentoId: departamentoEncontrado.id,
         // Actualiza otros campos según sea necesario
       });
+
       // Redirecciona a la página de detalle de la reserva actualizada
       res.redirect(`/detalle/${reservaId}`);
     } catch (error) {
@@ -178,7 +223,7 @@ module.exports = {
     reserva = await db.Reserva.findByPk(id);
     res.render("detalleReserva", { reserva });
   },
-  destroy: async (req, res) => {    
+  destroy: async (req, res) => {
     await db.Reserva.destroy({
       where: {
         id: req.params.id,
@@ -348,7 +393,7 @@ module.exports = {
           month: userMonth,
         },
         include: [{ model: db.Departamento, as: 'departamento' }],
-      });     
+      });
 
       res.render("verGastos", { gastos: filteredGastos, userYear, userMonth, userDepartments });
     } catch (error) {
@@ -403,7 +448,7 @@ module.exports = {
           },
           include: [{ model: db.Departamento, as: 'departamento' }],
         });
-      }      
+      }
       res.render("allGastos", { gastos: filteredGastos, userYear, userMonth, userDepartment });
     } catch (error) {
       console.error("Error al buscar gastos:", error.message);

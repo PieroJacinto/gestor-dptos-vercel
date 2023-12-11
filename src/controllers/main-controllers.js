@@ -105,9 +105,6 @@ module.exports = {
     }
   },
 
-  // Editar Reserva
-  // Editar Reserva
-  // Editar Reserva
   editarReserva: async (req, res) => {
     const reservaId = parseInt(req.params.id);
 
@@ -119,10 +116,8 @@ module.exports = {
         res.status(404).send("Reserva no encontrada");
         return;
       }
-
       // Validación de fechas y otros campos
       const resultValidation = validationResult(req);
-
       if (!resultValidation.isEmpty()) {
         return res.render("editarReserva", {
           csrfToken: req.csrfToken(),
@@ -131,7 +126,6 @@ module.exports = {
           reserva: reservaExistente,
         });
       }
-
       // Extrae los datos actualizados del cuerpo de la solicitud
       const {
         nombre,

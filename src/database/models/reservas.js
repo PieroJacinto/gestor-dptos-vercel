@@ -64,7 +64,7 @@ module.exports = function (sequelize, dataTypes) {
       },
       departamentoId: {
         type:dataTypes.INTEGER,
-        allownull: true,
+        allownull: false,
     }
 
     };

@@ -11,28 +11,23 @@ module.exports = {
       },
       nombre: 
       { 
-          type: DataTypes.STRING(500),
+          type: DataTypes.STRING(60),
           allowNull:false,
       },
       email: {
-          type: DataTypes.STRING(500),
+          type: DataTypes.STRING(60),
           allowNull:false,
       },
       contraseña:{
-          type: DataTypes.STRING(500),
+          type: DataTypes.STRING(60),
           allowNull:false,
       },
       admin: {
-        type: DataTypes.STRING(500),
-        allowNull: false,
-      },
-      departamento: {
-        type: DataTypes.STRING(500),
+        type: DataTypes.STRING(60),
         allowNull: false,
       }
     })
   },
-
   async down (queryInterface, Sequelize) {
     await queryInterface.dropTable("Usuarios");
   }

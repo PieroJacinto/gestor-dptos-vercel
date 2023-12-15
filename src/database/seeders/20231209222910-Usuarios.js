@@ -1,4 +1,5 @@
-// seeders/XXXXXX-usuarios.js
+const bcryptjs = require('bcryptjs');
+
 module.exports = {
   async up(queryInterface, Sequelize) {
     // Seed para crear usuarios
@@ -7,21 +8,21 @@ module.exports = {
         id: 1,
         nombre: "Piero",
         email: "pierojacinto@gmail.com",
-        contraseña: "$2a$10$3wFXvFJ1VVkQugkrvAts2eGEdikBCHawBi4H5oUYygW.rhFh/LQZm",
+        contraseña: bcryptjs.hashSync("9911", 10),
         admin: "full-admin",
       },     
       {
         id: 2,
         nombre: "Pilar",
         email: "pilar@gmail.com",
-        contraseña: "$2a$10$IqtJtedrjrbmmEqpYIDeX.6ee5sNLAzA.Zz35wxjVsj11HWKHfyU6",
+        contraseña: bcryptjs.hashSync("9911", 10),
         admin: "corrientes-admin",
       },
       {
         id: 3,
         nombre: "Gamondis",
         email: "ruben@gmail.com",
-        contraseña: "$2a$10$vVAsEdVzIIgcXe.yLwytruXg88e5hJUfYOOUJA.qSgdRpbEu4Y9Sa",
+        contraseña: bcryptjs.hashSync("9911", 10),
         admin: "las-heras-admin",
       }
     ]);
@@ -32,4 +33,3 @@ module.exports = {
     await queryInterface.bulkDelete("Usuarios", null, {});
   },
 };
-

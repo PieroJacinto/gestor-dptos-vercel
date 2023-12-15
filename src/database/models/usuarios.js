@@ -8,19 +8,19 @@ module.exports = function (sequelize, dataTypes) {
       autoIncrement: true,
     },
     nombre: {
-      type: dataTypes.STRING(500),
+      type: dataTypes.STRING(60),
       allowNull: false,
     },
     email: {
-      type: dataTypes.STRING(500),
+      type: dataTypes.STRING(60),
       allowNull: false,
     },
     contraseña: {
-      type: dataTypes.STRING(500),
+      type: dataTypes.STRING(60),
       allowNull: false,
     },
     admin: {
-      type: dataTypes.STRING(500),
+      type: dataTypes.STRING(60),
       allowNull: false,
     },
   };
